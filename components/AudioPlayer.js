@@ -69,17 +69,19 @@ const AudioPlayer = () => {
 	};
 
 	const backThirty = () => {
-		progressBar.current.value = Number(progressBar.current.value - 30);
+		progressBar.current.seekTo(progressBar.current.value - 10);
 		changeRange();
 	};
 
 	const forwardThirty = () => {
-		progressBar.current.value = Number(progressBar.current.value + 30);
+		progressBar.current.value = Number(
+			progressBar.current.getCurrentTime() + 10
+		);
 		changeRange();
 	};
 
 	return (
-		<div className={styles.audioPlayer}>
+		<>
 			<video
 				width={255}
 				ref={audioPlayer}
@@ -87,54 +89,217 @@ const AudioPlayer = () => {
 				type='video/mp4'
 				preload='metadata'
 			></video>
-			{/* <audio
-				ref={audioPlayer}
-				src='https://cdn.simplecast.com/audio/cae8b0eb-d9a9-480d-a652-0defcbe047f4/episodes/af52a99b-88c0-4638-b120-d46e142d06d3/audio/500344fb-2e2b-48af-be86-af6ac341a6da/default_tc.mp3'
-			></audio> */}
-			<button className={styles.forwardBackward} onClick={backThirty}>
-				<BsArrowLeftShort /> 30
-			</button>
-			<button onClick={togglePlayPause} className={styles.playPause}>
-				{isPlaying ? <FaPause /> : <FaPlay className={styles.play} />}
-			</button>
-			<button className={styles.forwardBackward} onClick={forwardThirty}>
-				30 <BsArrowRightShort />
-			</button>
-
-			{/* current time */}
-			<div className={styles.currentTime}>
-				{calculateTime(currentTime)}
+			<div className='bg-white border-slate-100 dark:bg-slate-800 dark:border-slate-500 border-b rounded-t-xl p-4 pb-6 sm:p-10 sm:pb-8 lg:p-6 xl:p-10 xl:pb-8 space-y-6 sm:space-y-8 lg:space-y-6 xl:space-y-8'>
+				<div className='flex items-center space-x-4'>
+					<div className='min-w-0 flex-auto space-y-1 font-semibold'>
+						<p className='text-cyan-500 dark:text-cyan-400 text-sm leading-6'>
+							<abbr title='Episode'>Ep.</abbr> 128
+						</p>
+						<h2 className='text-slate-500 dark:text-slate-400 text-sm leading-6 truncate'>
+							Scaling CSS at Heroku with Utility Classes
+						</h2>
+						<p className='text-slate-900 dark:text-slate-50 text-lg'>
+							Full Stack Radio
+						</p>
+					</div>
+				</div>
+				<div className='space-y-2'>
+					<div className='relative'>
+						<div>
+							{/* <input
+				defaultValue='0'
+				type='range'
+				id='volume'
+				name='volume'
+				min={0}
+				max={onDuration}
+				// ref={progressBar}
+				onChange={onSeek}
+				onMouseDown={onSeekMouseDown}
+				onChangeCommitted={onSeekMouseUp}
+			/> */}
+							<input
+								defaultValue='0'
+								className=' inset-0 h-full w-full'
+								type='range'
+								id='volume'
+								name='volume'
+								min='0'
+								max='11'
+								ref={progressBar}
+								onChange={changeRange}
+							/>
+						</div>
+					</div>
+					<div className='flex justify-between text-sm leading-6 font-medium tabular-nums'>
+						<div className='text-cyan-500 dark:text-slate-100'>
+							{calculateTime(currentTime)}
+						</div>
+						<div className='text-slate-500 dark:text-slate-400'>
+							{duration &&
+								!isNaN(duration) &&
+								calculateTime(duration)}
+						</div>
+					</div>
+				</div>
 			</div>
-
-			{/* progress bar */}
-			{/* <div className='bg-slate-700 rounded-full overflow-hidden'>
-				<input
-					type='range'
-					// className={styles.progressBar}
-					className='ring-cyan-500 dark:ring-cyan-400 ring-2 absolute  w-4 h-4 -mt-2 -ml-2 flex items-center justify-center bg-white rounded-full shadow'
-					defaultValue='0'
-					ref={progressBar}
-					onChange={changeRange}
-				/>
-			</div> */}
-			<div>
-				<input
-					defaultValue='0'
-					type='range'
-					id='volume'
-					name='volume'
-					min='0'
-					max='11'
-					ref={progressBar}
-					onChange={changeRange}
-				/>
+			<div className='bg-slate-50 text-slate-500 dark:bg-slate-600 dark:text-slate-200 rounded-b-xl flex items-center'>
+				<div className='flex-auto flex items-center justify-evenly'>
+					{/* <button
+						type='button'
+						onClick={onBookmark}
+						aria-label='Add to favorites'
+					>
+						{BookMarkIcon()}
+					</button> */}
+					{/* <button
+							type='button'
+							className='hidden sm:block lg:hidden xl:block'
+							aria-label='Previous'
+						>
+							<svg width='24' height='24' fill='none'>
+								<path
+									d='m10 12 8-6v12l-8-6Z'
+									fill='currentColor'
+									stroke='currentColor'
+									strokeWidth='2'
+									strokeLinecap='round'
+									strokeLinejoin='round'
+								/>
+								<path
+									d='M6 6v12'
+									stroke='currentColor'
+									strokeWidth='2'
+									strokeLinecap='round'
+									strokeLinejoin='round'
+								/>
+							</svg>
+						</button> */}
+					<button
+						onClick={backThirty}
+						type='button'
+						aria-label='Rewind 10 seconds'
+					>
+						<svg width='24' height='24' fill='none'>
+							<path
+								d='M6.492 16.95c2.861 2.733 7.5 2.733 10.362 0 2.861-2.734 2.861-7.166 0-9.9-2.862-2.733-7.501-2.733-10.362 0A7.096 7.096 0 0 0 5.5 8.226'
+								stroke='currentColor'
+								strokeWidth='2'
+								strokeLinecap='round'
+								strokeLinejoin='round'
+							/>
+							<path
+								d='M5 5v3.111c0 .491.398.889.889.889H9'
+								stroke='currentColor'
+								strokeWidth='2'
+								strokeLinecap='round'
+								strokeLinejoin='round'
+							/>
+						</svg>
+					</button>
+				</div>
+				<button
+					onClick={togglePlayPause}
+					type='button'
+					className='bg-white text-slate-900 dark:bg-slate-100 dark:text-slate-700 flex-none -my-2 mx-auto w-20 h-20 rounded-full ring-1 ring-slate-900/5 shadow-md flex items-center justify-center'
+					aria-label='Pause'
+				>
+					{isPlaying ? (
+						<svg width='30' height='32' fill='currentColor'>
+							<rect x='6' y='4' width='4' height='24' rx='2' />
+							<rect x='20' y='4' width='4' height='24' rx='2' />
+						</svg>
+					) : (
+						<svg
+							xmlns='http://www.w3.org/2000/svg'
+							className='h-5 w-5'
+							viewBox='0 0 20 20'
+							fill='currentColor'
+						>
+							<path
+								fillRule='evenodd'
+								d='M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z'
+								clipRule='evenodd'
+							/>
+						</svg>
+					)}
+				</button>
+				<div className='flex-auto flex items-center justify-evenly'>
+					<button
+						onClick={forwardThirty}
+						type='button'
+						aria-label='Skip 10 seconds'
+					>
+						<svg width='24' height='24' fill='none'>
+							<path
+								d='M17.509 16.95c-2.862 2.733-7.501 2.733-10.363 0-2.861-2.734-2.861-7.166 0-9.9 2.862-2.733 7.501-2.733 10.363 0 .38.365.711.759.991 1.176'
+								stroke='currentColor'
+								strokeWidth='2'
+								strokeLinecap='round'
+								strokeLinejoin='round'
+							/>
+							<path
+								d='M19 5v3.111c0 .491-.398.889-.889.889H15'
+								stroke='currentColor'
+								strokeWidth='2'
+								strokeLinecap='round'
+								strokeLinejoin='round'
+							/>
+						</svg>
+					</button>
+					{/* <button
+							type='button'
+							className='hidden sm:block lg:hidden xl:block'
+							aria-label='Next'
+						>
+							<svg width='24' height='24' fill='none'>
+								<path
+									d='M14 12 6 6v12l8-6Z'
+									fill='currentColor'
+									stroke='currentColor'
+									strokeWidth='2'
+									strokeLinecap='round'
+									strokeLinejoin='round'
+								/>
+								<path
+									d='M18 6v12'
+									stroke='currentColor'
+									strokeWidth='2'
+									strokeLinecap='round'
+									strokeLinejoin='round'
+								/>
+							</svg>
+						</button> */}
+					{/* <button
+							onClick={handleClick}
+							type='button'
+							className='rounded-lg text-xs leading-6 font-semibold px-2 ring-2 ring-inset ring-slate-500 text-slate-500 dark:text-slate-100 dark:ring-0 dark:bg-slate-500'
+						>
+							<div>
+								{[0.5, 1, 1.5, 2].map((rate) => (
+									<button
+										key={rate}
+										//   onClick={() => setState({ ...state, playbackRate: rate })}
+										onClick={() =>
+											onPlaybackRateChange(rate)
+										}
+									>
+										<Typography
+											color={
+												rate === playbackRate
+													? "secondary"
+													: "inherit"
+											}
+										>
+											{rate}X
+										</Typography>
+									</button>
+								))}
+							</div>
+						</button> */}
+				</div>
 			</div>
-
-			{/* duration */}
-			<div className={styles.duration}>
-				{duration && !isNaN(duration) && calculateTime(duration)}
-			</div>
-		</div>
+		</>
 	);
 };
 

@@ -1,9 +1,139 @@
-/* eslint-disable @next/next/no-img-element */
-import React, {useRef, useEffect, useState} from "react";
-import ReactPlayer from "react-player";
+import React, {useState, useRef, useEffect} from "react";
+import {findDOMNode} from "react-dom";
 
+import AppBar from "@material-ui/core/AppBar";
+import Toolbar from "@material-ui/core/Toolbar";
+import Typography from "@material-ui/core/Typography";
+import Container from "@material-ui/core/Container";
+import ReactPlayer from "react-player";
+import {makeStyles, withStyles} from "@material-ui/core/styles";
+
+import Slider from "@material-ui/core/Slider";
+import Tooltip from "@material-ui/core/Tooltip";
+import Grid from "@material-ui/core/Grid";
+import Paper from "@material-ui/core/Paper";
+import VolumeUp from "@material-ui/icons/VolumeUp";
+import VolumeDown from "@material-ui/icons/VolumeDown";
+import VolumeMute from "@material-ui/icons/VolumeOff";
+import FullScreen from "@material-ui/icons/Fullscreen";
+import Popover from "@material-ui/core/Popover";
+// import screenful from "screenfull";
 import Controls from "../components/Controls";
-import Control from "../components/Control";
+
+const useStyles = makeStyles((theme) => ({
+	playerWrapper: {
+		width: "100%",
+
+		position: "relative",
+		// "&:hover": {
+		//   "& $controlsWrapper": {
+		//     visibility: "visible",
+		//   },
+		// },
+	},
+
+	controlsWrapper: {
+		visibility: "hidden",
+		position: "absolute",
+		top: 0,
+		left: 0,
+		right: 0,
+		bottom: 0,
+		background: "rgba(0,0,0,0.4)",
+		display: "flex",
+		flexDirection: "column",
+		justifyContent: "space-between",
+	},
+	topControls: {
+		display: "flex",
+		justifyContent: "flex-end",
+		padding: theme.spacing(2),
+	},
+	middleControls: {
+		display: "flex",
+		alignItems: "center",
+		justifyContent: "center",
+	},
+	bottomWrapper: {
+		display: "flex",
+		flexDirection: "column",
+
+		// background: "rgba(0,0,0,0.6)",
+		// height: 60,
+		padding: theme.spacing(2),
+	},
+
+	bottomControls: {
+		display: "flex",
+		alignItems: "center",
+		justifyContent: "space-between",
+		// height:40,
+	},
+
+	button: {
+		margin: theme.spacing(1),
+	},
+	controlIcons: {
+		color: "#777",
+
+		fontSize: 50,
+		transform: "scale(0.9)",
+		"&:hover": {
+			color: "#fff",
+			transform: "scale(1)",
+		},
+	},
+
+	bottomIcons: {
+		color: "#999",
+		"&:hover": {
+			color: "#fff",
+		},
+	},
+
+	volumeSlider: {
+		width: 100,
+	},
+}));
+
+const PrettoSlider = withStyles({
+	root: {
+		height: 8,
+	},
+	thumb: {
+		height: 24,
+		width: 24,
+		backgroundColor: "#fff",
+		border: "2px solid currentColor",
+		marginTop: -8,
+		marginLeft: -12,
+		"&:focus, &:hover, &$active": {
+			boxShadow: "inherit",
+		},
+	},
+	active: {},
+	valueLabel: {
+		left: "calc(-50% + 4px)",
+	},
+	track: {
+		height: 8,
+		borderRadius: 4,
+	},
+	rail: {
+		height: 8,
+		borderRadius: 4,
+	},
+})(Slider);
+
+function ValueLabelComponent(props) {
+	const {children, open, value} = props;
+
+	return (
+		<Tooltip open={open} enterTouchDelay={0} placement='top' title={value}>
+			{children}
+		</Tooltip>
+	);
+}
 
 const format = (seconds) => {
 	if (isNaN(seconds)) {
@@ -22,6 +152,10 @@ const format = (seconds) => {
 let count = 0;
 
 function App() {
+	const classes = useStyles();
+	const [showControls, setShowControls] = useState(false);
+	// const [count, setCount] = useState(0);
+	const [anchorEl, setAnchorEl] = React.useState(null);
 	const [timeDisplayFormat, setTimeDisplayFormat] = React.useState("normal");
 	const [bookmarks, setBookmarks] = useState([]);
 	const [state, setState] = useState({
@@ -70,13 +204,13 @@ function App() {
 	};
 
 	const handleProgress = (changeState) => {
-		// if (count > 3) {
-		// 	controlsRef.current.style.visibility = "hidden";
-		// 	count = 0;
-		// }
-		// if (controlsRef?.current.style.visibility === "visible") {
-		// 	count += 1;
-		// }
+		if (count > 3) {
+			controlsRef.current.style.visibility = "hidden";
+			count = 0;
+		}
+		if (controlsRef.current.style.visibility == "visible") {
+			count += 1;
+		}
 		if (!state.seeking) {
 			setState({...state, ...changeState});
 		}
@@ -92,7 +226,6 @@ function App() {
 	};
 
 	const handleSeekMouseUp = (e, newValue) => {
-		console.log({value: e.target});
 		setState({...state, seeking: false});
 		// console.log(sliderRef.current.value)
 		playerRef.current.seekTo(newValue / 100, "fraction");
@@ -119,23 +252,23 @@ function App() {
 	};
 
 	const toggleFullScreen = () => {
-		console.log(playerContainerRef.current.requestFullscreen);
+		// screenful.toggle(playerContainerRef.current);
 	};
 
-	// const handleMouseMove = () => {
-	// 	console.log("mousemove");
-	// 	controlsRef.current.style.visibility = "visible";
-	// 	count = 0;
-	// };
+	const handleMouseMove = () => {
+		console.log("mousemove");
+		controlsRef.current.style.visibility = "visible";
+		count = 0;
+	};
 
-	// const hanldeMouseLeave = () => {
-	// 	controlsRef.current.style.visibility = "hidden";
-	// 	count = 0;
-	// };
+	const hanldeMouseLeave = () => {
+		controlsRef.current.style.visibility = "hidden";
+		count = 0;
+	};
 
 	const handleDisplayFormat = () => {
 		setTimeDisplayFormat(
-			timeDisplayFormat === "normal" ? "remaining" : "normal"
+			timeDisplayFormat == "normal" ? "remaining" : "normal"
 		);
 	};
 
@@ -182,7 +315,7 @@ function App() {
 			? playerRef.current.getDuration()
 			: "00:00";
 	const elapsedTime =
-		timeDisplayFormat === "normal"
+		timeDisplayFormat == "normal"
 			? format(currentTime)
 			: `-${format(duration - currentTime)}`;
 
@@ -190,12 +323,12 @@ function App() {
 
 	return (
 		<>
-			<div className='relative m-20'>
+			<Container maxWidth='md'>
 				<div
-					// onMouseMove={handleMouseMove}
-					// onMouseLeave={hanldeMouseLeave}
+					onMouseMove={handleMouseMove}
+					onMouseLeave={hanldeMouseLeave}
 					ref={playerContainerRef}
-					className='relative w-full'
+					className={classes.playerWrapper}
 				>
 					<ReactPlayer
 						ref={playerRef}
@@ -220,32 +353,7 @@ function App() {
 						}}
 					/>
 
-					{/* <Controls
-						ref={controlsRef}
-						onSeek={handleSeekChange}
-						onSeekMouseDown={handleSeekMouseDown}
-						onSeekMouseUp={handleSeekMouseUp}
-						onDuration={handleDuration}
-						onRewind={handleRewind}
-						onPlayPause={handlePlayPause}
-						onFastForward={handleFastForward}
-						playing={playing}
-						played={played}
-						elapsedTime={elapsedTime}
-						totalDuration={totalDuration}
-						onMute={hanldeMute}
-						muted={muted}
-						onVolumeChange={handleVolumeChange}
-						onVolumeSeekDown={handleVolumeSeekDown}
-						onChangeDispayFormat={handleDisplayFormat}
-						playbackRate={playbackRate}
-						onPlaybackRateChange={handlePlaybackRate}
-						onToggleFullScreen={toggleFullScreen}
-						volume={volume}
-						onBookmark={addBookmark}
-					/> */}
-
-					<Control
+					<Controls
 						ref={controlsRef}
 						onSeek={handleSeekChange}
 						onSeekMouseDown={handleSeekMouseDown}
@@ -271,10 +379,10 @@ function App() {
 					/>
 				</div>
 
-				<div className='mt-10 flex items-start justify-center'>
+				<Grid container style={{marginTop: 20}} spacing={3}>
 					{bookmarks.map((bookmark, index) => (
-						<div key={index} item>
-							<div
+						<Grid key={index} item>
+							<Paper
 								onClick={() => {
 									playerRef.current.seekTo(bookmark.time);
 									controlsRef.current.style.visibility =
@@ -287,35 +395,21 @@ function App() {
 								}}
 								elevation={3}
 							>
-								<Paper />
-								<div>bookmark at {bookmark.display}</div>
-							</div>
-						</div>
+								<img
+									crossOrigin='anonymous'
+									src={bookmark.image}
+								/>
+								<Typography variant='body2' align='center'>
+									bookmark at {bookmark.display}
+								</Typography>
+							</Paper>
+						</Grid>
 					))}
-				</div>
+				</Grid>
 				<canvas ref={canvasRef} />
-			</div>
+			</Container>
 		</>
 	);
 }
 
 export default App;
-
-function Paper() {
-	return (
-		<svg
-			xmlns='http://www.w3.org/2000/svg'
-			className='h-6 w-6'
-			fill='none'
-			viewBox='0 0 24 24'
-			stroke='currentColor'
-			strokeWidth={2}
-		>
-			<path
-				strokeLinecap='round'
-				strokeLinejoin='round'
-				d='M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z'
-			/>
-		</svg>
-	);
-}

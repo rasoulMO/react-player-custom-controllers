@@ -1,7 +1,8 @@
-import React, {forwardRef} from "react";
+import React, {forwardRef, useState} from "react";
 import PropTypes from "prop-types";
 import Typography from "@material-ui/core/Typography";
 import {makeStyles, withStyles} from "@material-ui/core/styles";
+import Button from "@material-ui/core/Button";
 import IconButton from "@material-ui/core/IconButton";
 import BookmarkIcon from "@material-ui/icons/Bookmark";
 import FastRewindIcon from "@material-ui/icons/FastRewind";
@@ -10,6 +11,7 @@ import PlayArrowIcon from "@material-ui/icons/PlayArrow";
 import PauseIcon from "@material-ui/icons/Pause";
 import Slider from "@material-ui/core/Slider";
 import Tooltip from "@material-ui/core/Tooltip";
+import Grid from "@material-ui/core/Grid";
 import VolumeUp from "@material-ui/icons/VolumeUp";
 import VolumeDown from "@material-ui/icons/VolumeDown";
 import VolumeMute from "@material-ui/icons/VolumeOff";
@@ -17,6 +19,20 @@ import FullScreen from "@material-ui/icons/Fullscreen";
 import Popover from "@material-ui/core/Popover";
 
 const useStyles = makeStyles((theme) => ({
+	controlsWrapper: {
+		visibility: "hidden",
+		position: "absolute",
+		top: 0,
+		left: 0,
+		right: 0,
+		bottom: 0,
+		height: "100%",
+		background: "rgba(0,0,0,0.6)",
+		display: "flex",
+		flexDirection: "column",
+		justifyContent: "space-between",
+	},
+
 	button: {
 		margin: theme.spacing(1),
 	},
@@ -126,18 +142,45 @@ const Controls = forwardRef(
 		return (
 			<div
 				ref={ref}
-				className='absolute h-full w-full flex justify-between flex-col bg-gray-900/30'
+				className='absolute top-0 bottom-0 right-0 left-0 flex flex-col justify-between bg-[rgba(0,0,0,0.6)]'
 			>
-				<div className='flex justify-between flex-col h-full'>
-					<div className='flex justify-between items-center flex-row p-5'>
-						<div>
-							<h1>Video Title</h1>
-						</div>
-						<div>
-							<button onClick={onBookmark}>Bookmark</button>
-						</div>
-					</div>
-					<div className='flex justify-center items-center flex-row'>
+				<Grid
+					container
+					direction='column'
+					justify='space-between'
+					style={{flexGrow: 1}}
+				>
+					<Grid
+						container
+						direction='row'
+						alignItems='center'
+						justify='space-between'
+						style
+						// eslint-disable-next-line react/jsx-no-duplicate-props
+						style={{padding: 16}}
+					>
+						<Grid item>
+							<Typography variant='h5' style={{color: "#fff"}}>
+								Video Title
+							</Typography>
+						</Grid>
+						<Grid item>
+							<Button
+								onClick={onBookmark}
+								variant='contained'
+								color='primary'
+								startIcon={<BookmarkIcon />}
+							>
+								Bookmark
+							</Button>
+						</Grid>
+					</Grid>
+					<Grid
+						container
+						direction='row'
+						alignItems='center'
+						justify='center'
+					>
 						<IconButton
 							onClick={onRewind}
 							className={classes.controlIcons}
@@ -166,10 +209,16 @@ const Controls = forwardRef(
 						>
 							<FastForwardIcon fontSize='inherit' />
 						</IconButton>
-					</div>
+					</Grid>
 					{/* bottom controls */}
-					<div className='flex justify-between items-center flex-row p-10'>
-						<div className='p-5'>
+					<Grid
+						container
+						direction='row'
+						justify='space-between'
+						alignItems='center'
+						style={{padding: 16}}
+					>
+						<Grid item xs={12}>
 							<PrettoSlider
 								min={0}
 								max={100}
@@ -186,10 +235,10 @@ const Controls = forwardRef(
 								onChangeCommitted={onSeekMouseUp}
 								onDuration={onDuration}
 							/>
-						</div>
+						</Grid>
 
-						<div>
-							<div className='flex justify-between items-center'>
+						<Grid item>
+							<Grid container alignItems='center'>
 								<IconButton
 									onClick={onPlayPause}
 									className={classes.bottomIcons}
@@ -225,7 +274,7 @@ const Controls = forwardRef(
 									onMouseDown={onSeekMouseDown}
 									onChangeCommitted={onVolumeSeekDown}
 								/>
-								<button
+								<Button
 									variant='text'
 									onClick={
 										onChangeDispayFormat
@@ -241,14 +290,19 @@ const Controls = forwardRef(
 									>
 										{elapsedTime}/{totalDuration}
 									</Typography>
-								</button>
-							</div>
-						</div>
+								</Button>
+							</Grid>
+						</Grid>
 
-						<div>
-							<button onClick={handleClick}>
+						<Grid item>
+							<Button
+								onClick={handleClick}
+								aria-describedby={id}
+								className={classes.bottomIcons}
+								variant='text'
+							>
 								<Typography>{playbackRate}X</Typography>
-							</button>
+							</Button>
 
 							<Popover
 								container={ref.current}
@@ -265,9 +319,9 @@ const Controls = forwardRef(
 									horizontal: "left",
 								}}
 							>
-								<div container direction='column-reverse'>
+								<Grid container direction='column-reverse'>
 									{[0.5, 1, 1.5, 2].map((rate) => (
-										<button
+										<Button
 											key={rate}
 											//   onClick={() => setState({ ...state, playbackRate: rate })}
 											onClick={() =>
@@ -284,31 +338,19 @@ const Controls = forwardRef(
 											>
 												{rate}X
 											</Typography>
-										</button>
+										</Button>
 									))}
-								</div>
+								</Grid>
 							</Popover>
-
-							<IconButton
-								onClick={onPlayPause}
-								className={classes.bottomIcons}
-							>
-								<div item>
-									<button
-										onClick={onBookmark}
-										startIcon={<BookmarkIcon />}
-									></button>
-								</div>
-							</IconButton>
 							<IconButton
 								onClick={onToggleFullScreen}
 								className={classes.bottomIcons}
 							>
 								<FullScreen fontSize='large' />
 							</IconButton>
-						</div>
-					</div>
-				</div>
+						</Grid>
+					</Grid>
+				</Grid>
 			</div>
 		);
 	}

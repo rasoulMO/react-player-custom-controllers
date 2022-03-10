@@ -66,57 +66,16 @@ const Control = forwardRef(
 								<input
 									defaultValue='0'
 									type='range'
-									id='volume'
-									name='volume'
 									min={0}
-									max={onDuration}
+									max={100}
+									className='inset-0 h-full w-full'
+									value={played * 100}
 									// ref={progressBar}
 									onChange={onSeek}
-									onMouseDown={onSeekMouseDown}
-									onChangeCommitted={onSeekMouseUp}
+									// onMouseDown={onSeekMouseDown}
+									// onChangeCommitted={onSeekMouseUp}
 								/>
 							</div>
-							{/* <div className='bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden'>
-								<input
-									type={`range`}
-									min={0}
-									max={onDuration}
-									style={{width: `${foo}%`}}
-									className='bg-cyan-500 dark:bg-cyan-400  h-2'
-									role='progressbar'
-									aria-label='music progress'
-									aria-valuenow='1456'
-									aria-valuemin='0'
-									aria-valuemax='4550'
-									value={played * 100}
-									onMouseDown={onSeekMouseDown}
-									onChangeCommitted={onSeekMouseUp}
-									onDuration={onDuration}
-								></input>
-								{/* <div>
-									<input
-										type='range'
-										className={styles.progressBar}
-										defaultValue='0'
-										ref={progressBar}
-										onChange={changeRange}
-									/>
-								</div> */}
-
-							{/* <input
-									type='range'
-									min={0}
-									max={onDuration}
-									style={{
-										// width: `${foo}%`,
-										left: `${foo}%`,
-										top: `${foo}%`,
-									}}
-									onChange={onSeek}
-									className='ring-cyan-500 dark:ring-cyan-400 ring-2 absolute  w-4 h-4 -mt-2 -ml-2 flex items-center justify-center bg-white rounded-full shadow'
-								/> */}
-							{/* <div className='w-1.5 h-1.5 bg-cyan-500 dark:bg-cyan-400 rounded-full ring-1 ring-inset ring-slate-900/5'></div>
-								</div> */}
 						</div>
 						<div className='flex justify-between text-sm leading-6 font-medium tabular-nums'>
 							<div className='text-cyan-500 dark:text-slate-100'>
